@@ -3,11 +3,13 @@ package com.mthien.identity_service.service;
 import com.mthien.identity_service.constant.PredefinedRole;
 import com.mthien.identity_service.entity.Role;
 import com.mthien.identity_service.entity.Users;
+import com.mthien.identity_service.mapper.ProfileMapper;
 import com.mthien.identity_service.mapper.UserMapper;
 import com.mthien.identity_service.payload.user.CreateUserRequest;
 import com.mthien.identity_service.payload.user.UserResponse;
 import com.mthien.identity_service.repository.RoleRepository;
 import com.mthien.identity_service.repository.UserRepository;
+import com.mthien.identity_service.repository.httpclient.ProfileClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,14 +32,24 @@ public class UserService {
     UserMapper userMapper;
     RoleRepository roleRepository;
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+    ProfileClient profileClient;
+    ProfileMapper profileMapper;
 
     public UserResponse createUser(CreateUserRequest request) {
         Users newUser = userMapper.createUser(request);
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+
         HashSet<Role> roles = new HashSet<>();
         roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
         newUser.setRoles(roles);
-        return userMapper.toUserResponse(userRepository.save(newUser));
+
+        newUser = userRepository.save(newUser);
+        var profileRequest = profileMapper.toProfileRequest(request);
+        profileRequest.setUserId(newUser.getId());
+
+        profileClient.createProfile(profileRequest);
+
+        return userMapper.toUserResponse(newUser);
     }
 
     @PostAuthorize("returnObject.id == authentication.getName()")

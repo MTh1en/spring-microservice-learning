@@ -23,10 +23,10 @@ public class UserResponse {
     String phone;
     String address;
     LocalDate dob;
-    boolean isActive;
-    boolean isGoogle;
-    boolean isFacebook;
-    boolean isVerified;
+    Boolean isActive;
+    Boolean isGoogle;
+    Boolean isFacebook;
+    Boolean isVerified;
     String verificationToken;
     LocalDateTime createAt;
     LocalDateTime updateAt;

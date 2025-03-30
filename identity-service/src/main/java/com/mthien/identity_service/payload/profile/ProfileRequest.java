@@ -1,4 +1,4 @@
-package com.mthien.identity_service.payload.user;
+package com.mthien.identity_service.payload.profile;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,18 +10,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateUserRequest {
-    String email;
-    String username;
-    String password;
+public class ProfileRequest {
+    String userId;
     String firstName;
     String lastName;
     String avatar;
     String phone;
     String address;
     LocalDate dob;
-    Boolean isActive;
-    Boolean isGoogle;
-    Boolean isFacebook;
-    Boolean isVerified;
 }

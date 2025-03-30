@@ -31,25 +31,17 @@ public class Users {
     String username;
     @Column(nullable = false)
     String password;
-    @Column(columnDefinition = "NVARCHAR(255)")
-    String firstName;
-    @Column(columnDefinition = "NVARCHAR(255)")
-    String lastName;
-    String avatar;
-    String phone;
-    String address;
-    LocalDate dob;
-    boolean isActive;
-    boolean isGoogle;
-    boolean isFacebook;
-    boolean isVerified;
+
+    Boolean isActive;
+    Boolean isGoogle;
+    Boolean isFacebook;
+    Boolean isVerified;
     @Column(unique = true)
     String verificationToken;
     @CreationTimestamp
     LocalDateTime createAt;
     @UpdateTimestamp
     LocalDateTime updateAt;
-
     @ManyToMany
     Set<Role> roles;
 }

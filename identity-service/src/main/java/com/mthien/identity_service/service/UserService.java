@@ -48,7 +48,6 @@ public class UserService {
         newUser = userRepository.save(newUser);
         var profileRequest = profileMapper.toProfileRequest(request);
         profileRequest.setUserId(newUser.getId());
-
         profileClient.createProfile(profileRequest);
 
         return userMapper.toUserResponse(newUser);

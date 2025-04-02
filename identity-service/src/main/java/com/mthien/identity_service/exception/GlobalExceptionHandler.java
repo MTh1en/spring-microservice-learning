@@ -1,11 +1,14 @@
 package com.mthien.identity_service.exception;
 
-import com.mthien.identity_service.payload.ApiResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.mthien.identity_service.payload.ApiResponse;
+
+import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
 @Slf4j
@@ -28,5 +31,15 @@ public class GlobalExceptionHandler {
                 .message(e.getErrorCode().getMessage())
                 .data(null)
                 .build());
+    }
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Object>> handlingAccessDeniedException(AccessDeniedException exception) {
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED_CLIENT;
+
+        return ResponseEntity.status(errorCode.getHttpStatusCode())
+                .body(ApiResponse.builder()
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build());
     }
 }

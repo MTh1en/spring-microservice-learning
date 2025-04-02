@@ -1,4 +1,4 @@
-package com.mthien.identity_service.config;
+package com.example.profileservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,10 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINT = {
-            "/auth/**",
-            "/permissions/**",
-            "/roles/**",
-            "/users/registration"
+           
     };
     private final CustomJwtDecoder customJwtDecoder;
 

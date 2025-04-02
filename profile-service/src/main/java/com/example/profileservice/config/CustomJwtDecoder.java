@@ -1,4 +1,4 @@
-package com.mthien.identity_service.config;
+package com.example.profileservice.config;
 
 import java.text.ParseException;
 
@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomJwtDecoder implements JwtDecoder {
-
     @Override
     public Jwt decode(String token) throws JwtException {
         try {

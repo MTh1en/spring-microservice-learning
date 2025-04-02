@@ -1,12 +1,19 @@
 package com.example.profileservice.controller;
 
-import com.example.profileservice.payload.UserProfileRequest;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.profileservice.payload.ApiResponse;
 import com.example.profileservice.payload.UserProfileResponse;
 import com.example.profileservice.service.UserProfileService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,12 +22,26 @@ public class UserProfileController {
     UserProfileService userProfileService;
 
     @GetMapping("/users/{profileId}")
-    UserProfileResponse getProfile(@PathVariable String profileId) {
-        return userProfileService.getProfile(profileId);
+    ApiResponse<UserProfileResponse> getProfile(@PathVariable String profileId) {
+        return ApiResponse.<UserProfileResponse>builder()
+                .message("Get user profile successfully")
+                .data(userProfileService.getProfile(profileId))
+                .build();
+    }
+
+    @GetMapping("/users")
+    ApiResponse<List<UserProfileResponse>> getAllProfiles() {
+        return ApiResponse.<List<UserProfileResponse>>builder()
+                .message("Get user profile successfully")
+                .data(userProfileService.getAllProfilese())
+                .build();
     }
 
     @DeleteMapping("/users/{profileId}")
-    void deleteProfile(@PathVariable String profileId) {
+    ApiResponse<Void> deleteProfile(@PathVariable String profileId) {
         userProfileService.deleteProfile(profileId);
+        return ApiResponse.<Void>builder()
+                .message("Delete user profile successfully")
+                .build();
     }
 }

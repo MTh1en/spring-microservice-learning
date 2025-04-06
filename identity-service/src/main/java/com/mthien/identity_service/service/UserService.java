@@ -3,6 +3,7 @@ package com.mthien.identity_service.service;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +37,7 @@ public class UserService {
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
     ProfileClient profileClient;
     ProfileMapper profileMapper;
+    KafkaTemplate<String, String> kafkaTemplate;
 
     public UserResponse createUser(CreateUserRequest request) {
         Users newUser = userMapper.createUser(request);
@@ -50,6 +52,9 @@ public class UserService {
         profileRequest.setUserId(newUser.getId());
         profileClient.createProfile(profileRequest);
 
+        //Publish message to kafka
+        kafkaTemplate.send("onboard-successful", "Welcome our new member" + newUser.getUsername());
+        
         return userMapper.toUserResponse(newUser);
     }
 

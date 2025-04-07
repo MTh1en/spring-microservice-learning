@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.mthien.event.dto.NotificationEvent;
 import com.mthien.identity_service.constant.PredefinedRole;
 import com.mthien.identity_service.entity.Role;
 import com.mthien.identity_service.entity.Users;
@@ -37,7 +38,7 @@ public class UserService {
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
     ProfileClient profileClient;
     ProfileMapper profileMapper;
-    KafkaTemplate<String, String> kafkaTemplate;
+    KafkaTemplate<String, Object> kafkaTemplate;
 
     public UserResponse createUser(CreateUserRequest request) {
         Users newUser = userMapper.createUser(request);
@@ -52,8 +53,17 @@ public class UserService {
         profileRequest.setUserId(newUser.getId());
         profileClient.createProfile(profileRequest);
 
+        NotificationEvent notificationEvent = NotificationEvent.builder()
+                .channel("EMAIL")
+                .recepient(request.getEmail())
+                .teemplateCode("welcome")
+                .param(null)
+                .subject("Welcome to our service")
+                .body("Welcome to our service, " + newUser.getUsername())
+                .build();
+                
         //Publish message to kafka
-        kafkaTemplate.send("onboard-successful", "Welcome our new member" + newUser.getUsername());
+        kafkaTemplate.send("notification-delivery", notificationEvent);
         
         return userMapper.toUserResponse(newUser);
     }

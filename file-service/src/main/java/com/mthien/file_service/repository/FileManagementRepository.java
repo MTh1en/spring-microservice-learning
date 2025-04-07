@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FileManagementRepository extends MongoRepository<FileManagement, String> {
-
+    
 }

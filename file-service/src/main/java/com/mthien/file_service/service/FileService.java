@@ -6,7 +6,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mthien.file_service.exception.AppException;
+import com.mthien.file_service.exception.ErrorCode;
 import com.mthien.file_service.mapper.FileManagementMapper;
+import com.mthien.file_service.payload.response.FileData;
 import com.mthien.file_service.payload.response.FileResponse;
 import com.mthien.file_service.repository.FileManagementRepository;
 import com.mthien.file_service.repository.FileRepository;
@@ -36,6 +39,14 @@ public class FileService {
         return FileResponse.builder()
                 .originalFileName(file.getOriginalFilename())
                 .url(fileInfo.getUrl())
-                .build();   
+                .build();
+    }
+
+    public FileData dowload(String fileName) throws IOException {
+        var fileManagement = fileManagementRepository.findById(fileName).orElseThrow(() -> new AppException(ErrorCode.FILE_NOT_FOUND));
+
+        var resource = fileRepository.read(fileManagement);
+
+        return new FileData(fileManagement.getContentType(), resource);
     }
 }

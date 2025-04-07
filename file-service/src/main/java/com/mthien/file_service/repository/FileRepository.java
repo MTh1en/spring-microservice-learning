@@ -9,11 +9,14 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mthien.file_service.entity.FileManagement;
 import com.mthien.file_service.payload.FileInfo;
 
 import lombok.extern.slf4j.Slf4j;
@@ -46,5 +49,10 @@ public class FileRepository {
                 .path(filePath.toString())
                 .url(urlPrefix + fileName)
                 .build();
+    }
+
+    public Resource read(FileManagement fileManagement) throws IOException {
+        var data = Files.readAllBytes(Path.of(fileManagement.getPath()));
+        return new ByteArrayResource(data);
     }
 }

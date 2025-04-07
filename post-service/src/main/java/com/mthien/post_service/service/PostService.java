@@ -26,6 +26,7 @@ import lombok.experimental.FieldDefaults;
 public class PostService {
     PostRepository postRepository;
     PostMapper postMapper;
+    DateTimeFormatter dateTimeFormatter;
 
     public PostResponse createPost(PostRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -47,15 +48,20 @@ public class PostService {
         Sort sort = Sort.by("createdDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         var pageData = postRepository.findAllByUserId(userId, pageable);
+        
+        var postList = pageData.getContent().stream()
+            .map(post -> {
+                var postResponse = postMapper.toPostResponse(post);
+                postResponse.setCreated(dateTimeFormatter.formart(postResponse.getCreatedDate()));
+                return postResponse;
+            }).toList();
 
         return PageResponse.<PostResponse>builder()
                 .currentPage(page)
                 .totalPages(pageData.getTotalPages())
                 .pageSize(pageData.getSize())
                 .totalElements(pageData.getTotalElements())
-                .data(pageData.getContent().stream()
-                        .map(postMapper::toPostResponse)
-                        .toList())
+                .data(postList)
                 .build();
     }
 }

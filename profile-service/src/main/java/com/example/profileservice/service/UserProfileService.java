@@ -7,6 +7,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.example.profileservice.entity.UserProfile;
+import com.example.profileservice.exception.AppException;
+import com.example.profileservice.exception.ErrorCode;
 import com.example.profileservice.mapper.UserProfileMapper;
 import com.example.profileservice.payload.UserProfileRequest;
 import com.example.profileservice.payload.UserProfileResponse;
@@ -31,9 +33,15 @@ public class UserProfileService {
         return userProfileMapper.toUserProfileResponse(userProfile);
     }
 
+    public UserProfileResponse getByUserId(String userId) {
+        UserProfile userProfile = userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        return userProfileMapper.toUserProfileResponse(userProfile);
+    }
+
     public UserProfileResponse getProfile(String id) {
         UserProfile userProfile = userProfileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         return userProfileMapper.toUserProfileResponse(userProfile);
     }
 

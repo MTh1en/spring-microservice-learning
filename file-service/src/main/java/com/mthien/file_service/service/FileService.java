@@ -1,36 +1,41 @@
 package com.mthien.file_service.service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Objects;
-import java.util.UUID;
+import java.io.IOException;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mthien.file_service.mapper.FileManagementMapper;
+import com.mthien.file_service.payload.response.FileResponse;
+import com.mthien.file_service.repository.FileManagementRepository;
+import com.mthien.file_service.repository.FileRepository;
+
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FileService {
-    public Object uploadFile(MultipartFile file) {
-        Path folder = Paths.get("D:/Upload");
+    FileRepository fileRepository;
+    FileManagementRepository fileManagementRepository;
+    FileManagementMapper fileManagementMapper;
 
-        String fileExtension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-        String fileName = Objects.isNull(fileExtension)
-                ? UUID.randomUUID().toString()
-                : UUID.randomUUID().toString() + "." + fileExtension;
-        Path filePath = folder.resolve(fileName).normalize().toAbsolutePath();
-        try {
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception e) {
-            log.error("Error while uploading file: {}", e.getMessage());
-        }
-        return null;
+    public FileResponse uploadFile(MultipartFile file) throws IOException {
+        var fileInfo = fileRepository.store(file);
+
+        var fileManagement = fileManagementMapper.toFileManagement(fileInfo);
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        fileManagement.setOwnerId(userId);
+        fileManagementRepository.save(fileManagement);
+
+        return FileResponse.builder()
+                .originalFileName(file.getOriginalFilename())
+                .url(fileInfo.getUrl())
+                .build();   
     }
 }

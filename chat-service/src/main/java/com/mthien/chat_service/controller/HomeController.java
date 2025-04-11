@@ -8,8 +8,13 @@ import org.springframework.web.servlet.ModelAndView;
 public class HomeController {
 
     @GetMapping("/group-chat")
-    public ModelAndView index() {
+    public ModelAndView group() {
         return new ModelAndView("group-chat");
+    }
+
+    @GetMapping("/room-chat")
+    public ModelAndView room() {
+        return new ModelAndView("room-chat");
     }
 
     @GetMapping("/home")

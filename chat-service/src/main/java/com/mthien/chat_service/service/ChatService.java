@@ -1,5 +1,7 @@
 package com.mthien.chat_service.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
 import com.mthien.chat_service.entity.Message;
@@ -29,7 +31,7 @@ public class ChatService {
         Message message = Message.builder()
                 .sender(request.getSender())
                 .content(request.getContent())
-                .timeStamp(request.getMessageTime())
+                .timeStamp(LocalDateTime.now())
                 .build();
         existingRoom.getMessages().add(message);
         roomRepository.save(existingRoom); // Save the updated room with the new message

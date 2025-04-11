@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mthien.chat_service.entity.Room;
 import com.mthien.chat_service.service.RoomService;
 
 import lombok.AccessLevel;

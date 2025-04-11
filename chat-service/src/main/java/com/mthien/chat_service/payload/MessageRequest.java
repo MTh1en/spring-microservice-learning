@@ -17,6 +17,6 @@ import lombok.experimental.FieldDefaults;
 public class MessageRequest {
     String sender;
     String content;
-    String roomId;
     LocalDateTime messageTime;
+    MessageType type;
 }

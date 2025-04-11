@@ -6,8 +6,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import com.mthien.chat_service.entity.Message;
 import com.mthien.chat_service.payload.ChatMessage;
 import com.mthien.chat_service.payload.MessageRequest;
@@ -23,11 +21,11 @@ import lombok.experimental.FieldDefaults;
 public class ChatController {
     ChatService chatService;
 
-    @MessageMapping("/sendMessage/{roomId}")
+    @MessageMapping("/chat/sendMessage/{roomId}")
     @SendTo("/topic/room/{roomId}")
     public Message sendMessage(
             @DestinationVariable String roomId,
-            @RequestBody MessageRequest request) {
+            @Payload MessageRequest request) {
         var response = chatService.sendMessage(roomId, request);
         if (response == null) {
             throw new RuntimeException("Room not found"); // Handle the case where the
@@ -35,15 +33,26 @@ public class ChatController {
         return response; // Return the message
     }
 
-    @MessageMapping("/chat.sendMessage")
+    @MessageMapping("/chat/addUserRoom/{roomId}")
+    @SendTo("/topic/room/{roomId}")
+    public MessageRequest addUserRoom(
+            @DestinationVariable String roomId,
+            @Payload MessageRequest messageRequest,
+            SimpMessageHeaderAccessor headerAccessor) {
+        // Add username in websocket session
+        headerAccessor.getSessionAttributes().put("username", messageRequest.getSender());
+        return messageRequest;
+    }
+
+    @MessageMapping("/chat/sendMessage")
     @SendTo("/topic/public")
     public ChatMessage sendGroupMessage(@Payload ChatMessage chatMessage) {
         return chatMessage;
     }
 
-    @MessageMapping("/chat.addUser")
+    @MessageMapping("/chat/addUserGroup")
     @SendTo("/topic/public")
-    public ChatMessage addUser(
+    public ChatMessage addUserGroup(
             @Payload ChatMessage chatMessage,
             SimpMessageHeaderAccessor headerAccessor) {
         // Add username in websocket session
